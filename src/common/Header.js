@@ -1,0 +1,31 @@
+import React from 'react';
+import { View, Text, StyleSheet, Platform, StatusBar } from 'react-native';
+
+const Header = ({ title }) => {
+  return (
+    <View style={styles.headerContainer}>
+      <Text style={styles.headerText}>{title}</Text>
+    </View>
+  );
+};
+
+export default Header;
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    backgroundColor: '#2DBE7C',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 20,
+    paddingBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 500,
+    top:-30,
+    left: -60,
+    
+  },
+  headerText: {
+    color: 'white',
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+});
