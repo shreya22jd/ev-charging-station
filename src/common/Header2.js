@@ -13,7 +13,7 @@ export default Header2;
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: '#2DBE7C',
+    backgroundColor: '#5bc99d',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 20,
     paddingBottom: 20,
     alignItems: 'center',

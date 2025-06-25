@@ -1,56 +1,3 @@
-// const express = require('express');
-// const mongoose = require('mongoose');
-// const cors = require('cors');
-// require('dotenv').config();
-
-// const selectOneRoutes = require('./beckn/routes/selectone');
-// const becknStationRoutes = require('./beckn/routes/station');
-// const accountRoutes = require("./routes/account");
-// const authRoutes = require('./routes/auth');
-// const station=require("./routes/stationRoute.js")
-// const app = express();
-
-// // Middleware
-// app.use(express.json());
-// app.use(cors());
-
-// // MongoDB Connection
-// mongoose.connect(process.env.MONGO_URI, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// }).then(() => console.log('✅ MongoDB Connected'))
-//   .catch(err => {
-//       console.error('❌ MongoDB Connection Error:', err);
-//       process.exit(1); // Exit on connection failure
-//   });
-
-// // Default route
-// app.get('/', (req, res) => {
-//     res.send('🚀 Server is running...');
-// });
-
-// // ✅ Use separate subpaths for each route file to avoid conflicts
-// app.use('/beckn/station', becknStationRoutes);     // e.g. /beckn/station/call
-// app.use('/beckn/selectone', selectOneRoutes);      // e.g. /beckn/selectone/trigger
-// const confirmRoute = require("./beckn/routes/confirm");
-// const onConfirmRoute = require("./beckn/routes/on_confirm");
-
-// app.use("/beckn", confirmRoute);
-// app.use("/beckn", onConfirmRoute);
-
-
-
-// // Other API routes
-// app.use("/api/account", accountRoutes);
-// app.use("/api/auth", authRoutes);
-// app.use('/api',station);
-// // Start server
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//   console.log(`🚀 Dummy BAP running on port ${PORT}`);
-// });
-
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -66,6 +13,10 @@ const onConfirmRoute = require('./beckn/routes/on_confirm');
 const accountRoutes = require("./routes/account");
 const authRoutes = require('./routes/auth');
 const station = require("./routes/stationRoute.js");
+
+
+const searchRoute = require('./beckn/routes/search');
+const onsearchRoute = require('./beckn/routes/on_search');
 
 const app = express();
 const server = http.createServer(app);
@@ -106,6 +57,11 @@ app.use('/beckn/station', becknStationRoutes);
 app.use('/beckn/selectone', selectOneRoutes);
 app.use('/beckn', confirmRoute);
 app.use('/beckn', onConfirmRoute);
+
+
+app.use('/beckn', searchRoute);
+app.use('/beckn', onsearchRoute);
+
 app.use('/api/account', accountRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api', station);

@@ -1,19 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, ActivityIndicator, TextInput, Image } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  Image,
+} from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { fetchAllStations } from '../api/bapApi';
 import Footer from '../common/Footer';
-import Header from '../common/Header'; // Adjust the path if needed
+import Header from '../common/Header';
+import SearchSection from '../common/SearchSection';
 
-// Import the images
 import img01 from '../../assets/img01.png';
 
 const Home = ({ navigation }) => {
   const [stations, setStations] = useState([]);
+  const [filteredStations, setFilteredStations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredStations, setFilteredStations] = useState([]);
+  const [username, setUsername] = useState('');
 
+  // Fetch stations
   useEffect(() => {
     const loadStations = async () => {
       try {
@@ -31,28 +43,44 @@ const Home = ({ navigation }) => {
     loadStations();
   }, []);
 
-  const handleSearch = () => {
-    if (searchQuery.trim() === '') {
-      setFilteredStations(stations);
-    } else {
-      const filtered = stations.filter(station =>
-        station.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredStations(filtered);
-    }
-  };
+  // Fetch username from storage
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3Y2MxNDRiYWY1YzI5ZjUyMTcyZGY3NiIsImlhdCI6MTc0MjQ0NjUzOCwiZXhwIjoxNzczOTgyNTM4fQ.MFrsevI_POX8uAny7BWhvA_W5hRVFW51W6FPyp7R_XY`;
+        const userId = await AsyncStorage.getItem("userId");
+
+        if (!token || !userId) return;
+
+        const response = await fetch(`http://192.168.29.243:5000/api/auth/user/${userId}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        if (response.ok && data?.username) {
+          setUsername(data.username);
+        }
+      } catch (error) {
+        console.log('Failed to fetch username:', error.message);
+      }
+    };
+
+    fetchUsername();
+  }, []);
 
   const renderStation = ({ item }) => (
     <View style={styles.stationCard}>
       <Image source={img01} style={styles.stationImage} />
-
       <View style={styles.stationDetails}>
         <Text style={styles.stationName}>{item.name}</Text>
         <Text style={styles.stationLocation}>
-          {item.address ? item.address : 'Address not available'}
+          {item.address || 'Address not available'}
         </Text>
       </View>
-
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('BookSlot', { stationId: item._id })}
@@ -79,56 +107,47 @@ const Home = ({ navigation }) => {
   }
 
   return (
+  <View style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+<Header title={`Welcome, ${username || 'User'}!`} />
+    
     <View style={styles.container}>
-      <Header title="Home" />
-      {/* Search Input */}
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search Stations"
-        value={searchQuery}
-        onChangeText={text => setSearchQuery(text)}
-        onSubmitEditing={handleSearch}
+      <SearchSection
+        stations={stations}
+        onResults={setFilteredStations}
+        onLoading={setLoading}
       />
 
-      {/* Station List */}
       <FlatList
         data={filteredStations}
         renderItem={renderStation}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.stationList}
-        showsVerticalScrollIndicator={false} // <== Hides scroll indicator
+        showsVerticalScrollIndicator={false}
       />
-
-  <Footer navigation={navigation} />
-
     </View>
-  );
+
+    <Footer navigation={navigation} />
+  </View>
+);
+
 };
 
 export default Home;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
+ container: {
+  flex: 1,
+  padding: 20,
+  backgroundColor: '#f5f5f5',
+},
+
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  searchInput: {
-    width: '100%',
-    padding: 10,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    fontSize: 16,
-  },
   stationList: {
-    paddingBottom: 80, // So that the last item is not hidden behind the Footer
+    paddingBottom: 80,
   },
   stationCard: {
     backgroundColor: '#fff',
@@ -151,7 +170,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   button: {
-    backgroundColor: '#2DBE7C',
+    backgroundColor: '#5bc99d',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,

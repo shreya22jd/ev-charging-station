@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGO_URI, {
   .catch(err => console.error('❌ MongoDB Connection Error for Dummy BPP:', err));
 
 // ✅ Routes with Specific Paths
-app.use('/beckn/on_search', onSearchRouter);
+app.use('/', onSearchRouter);
 app.use('/beckn/on_select', onSelectRouter);
 app.use('/beckn/on_init', onInitRouter);
 app.use('/beckn/on_confirm', onConfirmRouter);

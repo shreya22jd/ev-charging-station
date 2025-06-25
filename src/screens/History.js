@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import Header from '../common/Header';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const History = () => {
   const [transactions, setTransactions] = useState([]);
@@ -10,25 +18,35 @@ const History = () => {
   const BAP_SERVER_URL = 'http://192.168.29.243:5000/beckn';
 
   useEffect(() => {
-    fetchTransactions();
+    const loadUserAndTransactions = async () => {
+      try {
+        const userId = await AsyncStorage.getItem("userId");
+        if (!userId) {
+          console.warn("User ID not found.");
+          return;
+        }
+
+        const response = await fetch(`${BAP_SERVER_URL}/transactions`);
+        const data = await response.json();
+
+        // Filter only this user's transactions
+        const userTransactions = data.filter(txn => txn?.bill?.userId === userId);
+
+        // Sort by latest first
+        const sortedData = userTransactions.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setTransactions(sortedData);
+      } catch (error) {
+        console.error('Failed to fetch transactions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserAndTransactions();
   }, []);
-
-  const fetchTransactions = async () => {
-  try {
-    const response = await fetch(`${BAP_SERVER_URL}/transactions`);
-    const data = await response.json();
-    // Sort transactions by createdAt descending (newest first)
-    const sortedData = data.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-    setTransactions(sortedData);
-  } catch (error) {
-    console.error('Failed to fetch transactions:', error);
-  } finally {
-    setLoading(false);
-  }
-};
-
 
   const toggleExpand = (id) => {
     setExpandedIds((prev) => ({
@@ -41,18 +59,23 @@ const History = () => {
     const isExpanded = !!expandedIds[item.transactionId];
 
     return (
-
       <View style={styles.item}>
         <View style={styles.topRow}>
-          
           <View>
             <Text style={styles.amount}>₹{item.bill.amount}</Text>
             <Text style={styles.stationId}>Station ID: {item.bill.stationId}</Text>
           </View>
           <View style={styles.rightTop}>
-            <Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-            <TouchableOpacity onPress={() => toggleExpand(item.transactionId)} style={styles.detailsButton}>
-              <Text style={styles.detailsButtonText}>{isExpanded ? 'Hide Details' : 'Details'}</Text>
+            <Text style={styles.date}>
+              {new Date(item.createdAt).toLocaleDateString()}
+            </Text>
+            <TouchableOpacity
+              onPress={() => toggleExpand(item.transactionId)}
+              style={styles.detailsButton}
+            >
+              <Text style={styles.detailsButtonText}>
+                {isExpanded ? 'Hide Details' : 'Details'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -63,7 +86,9 @@ const History = () => {
             <Text>Status: {item.status}</Text>
             <Text>User ID: {item.bill.userId}</Text>
             <Text>Time: {new Date(item.createdAt).toLocaleString()}</Text>
-            {item.confirmedAt && <Text>Confirmed At: {new Date(item.confirmedAt).toLocaleString()}</Text>}
+            {item.confirmedAt && (
+              <Text>Confirmed At: {new Date(item.confirmedAt).toLocaleString()}</Text>
+            )}
           </View>
         )}
       </View>
@@ -71,18 +96,26 @@ const History = () => {
   };
 
   return (
-    <View style={styles.container}>
-       <Header title="History" />
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <FlatList
-          data={transactions}
-          keyExtractor={(item) => item.transactionId}
-          renderItem={renderItem}
-          contentContainerStyle={styles.list}
-        />
-      )}
+    <View style={{ flex: 1, backgroundColor: '#f2f2f2' }}>
+      <Header title="History" />
+
+      <View style={styles.container}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <FlatList
+            data={transactions}
+            keyExtractor={(item) => item.transactionId}
+            renderItem={renderItem}
+            contentContainerStyle={styles.list}
+            ListEmptyComponent={
+              <Text style={{ textAlign: 'center', marginTop: 20, color: '#888' }}>
+                No transactions found.
+              </Text>
+            }
+          />
+        )}
+      </View>
     </View>
   );
 };
@@ -131,7 +164,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   detailsButton: {
-    backgroundColor: '#2DBE7C',
+    backgroundColor: '#5bc99d',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 4,

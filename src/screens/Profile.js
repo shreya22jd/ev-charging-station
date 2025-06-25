@@ -2,18 +2,17 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   ActivityIndicator,
   Alert,
-  StatusBar,
-  TouchableOpacity,
-  Platform,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import Icon from 'react-native-vector-icons/Feather';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+
+import Header from "../common/Header";
 import Footer from "../common/Footer";
 
 const Profile = () => {
@@ -61,165 +60,165 @@ const Profile = () => {
     }
   };
 
+  const MenuItem = ({ label, icon, onPress, color = "#333" }) => (
+    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+      <View style={styles.iconLabel}>
+        <Icon name={icon} size={22} color={color} />
+        <Text style={[styles.menuText, { color }]}>{label}</Text>
+      </View>
+      <Icon name="chevron-right" size={20} color="#999" />
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
-      {/* Custom Header */}
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Profile</Text>
-      </View>
+      <Header title="Profile" />
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color="#2DBE7C" />
         ) : user && user.username ? (
           <>
-            <View style={styles.profileHeader}>
-<Icon name="user" size={80} color="#2DBE7C" style={{ marginBottom: 20, marginTop:10 }} />
+           <View style={styles.profileCard}>
+  <Icon name="user" size={80} color="#5bc99d" />
   <Text style={styles.profileName}>{user.username}</Text>
   <Text style={styles.profileEmail}>{user.email}</Text>
 </View>
 
 
             <View style={styles.menuContainer}>
-              <TouchableOpacity
-                style={styles.optionBox}
+              <MenuItem
+                label="Account"
+                icon="user"
                 onPress={() => navigation.navigate("Account")}
-              >
-                <Text style={styles.optionText}>👤 Account</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.optionBox}
+              />
+              <MenuItem
+                label="Your Bookings"
+                icon="calendar"
                 onPress={() => navigation.navigate("History")}
-              >
-                <Text style={styles.optionText}>📅 Your Booking</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.optionBox}
+              />
+              <MenuItem
+                label="Privacy Policy"
+                icon="lock"
                 onPress={() => navigation.navigate("PrivacyPolicy")}
-              >
-                <Text style={styles.optionText}>🔒 Privacy Policy</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.optionBox}
+              />
+              <MenuItem
+                label="Terms & Conditions"
+                icon="file-text"
                 onPress={() => navigation.navigate("TermsConditions")}
-              >
-                <Text style={styles.optionText}>📜 Terms & Conditions</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.optionBox}
+              />
+              <MenuItem
+                label="Reset Password"
+                icon="key"
                 onPress={() => navigation.navigate("ResetPassword")}
-              >
-                <Text style={styles.optionText}>🔑 Reset Password</Text>
-              </TouchableOpacity>
-
-             
-// Inside your component
-<TouchableOpacity
-  style={[styles.optionBox, styles.logoutButton]}
-  onPress={() =>
-    Alert.alert(
-      "Confirm Logout",
-      "Are you sure you want to log out?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "Yes",
-          onPress: () => navigation.navigate("getstartpage")
-        }
-      ],
-      { cancelable: false }
-    )
-  }
->
-  <Text style={[styles.optionText, { color: "red" }]}>🚪 Logout</Text>
-</TouchableOpacity>
+              />
+              <MenuItem
+                label="Logout"
+                icon="log-out"
+                onPress={() =>
+                  Alert.alert(
+                    "Confirm Logout",
+                    "Are you sure you want to log out?",
+                    [
+                      { text: "Cancel", style: "cancel" },
+                      {
+                        text: "Yes",
+                        onPress: () => navigation.navigate("getstartpage"),
+                      },
+                    ],
+                    { cancelable: false }
+                  )
+                }
+                color="red"
+              />
             </View>
           </>
         ) : (
-          <Text style={{ color: "red", textAlign: "center", marginTop: 20 }}>
+          <Text style={styles.errorText}>
             Error: No user data received.
           </Text>
         )}
       </ScrollView>
 
-      {/* Footer Navigation */}
       <Footer navigation={navigation} />
-
     </View>
   );
 };
 
+export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    justifyContent: "space-between",
   },
   scrollContainer: {
-    paddingBottom: 20,
-  },
-  headerContainer: {
-    backgroundColor: "#2DBE7C",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 40,
-    paddingBottom: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-  },
-  headerText: {
-    color: "white",
-    fontSize: 22,
-    fontWeight: "bold",
+    paddingBottom: 30,
   },
   profileHeader: {
     alignItems: "center",
-    marginBottom: 20,
-    marginTop: 20,
-  },
-  profilePic: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
+    paddingVertical: 30,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
   },
   profileName: {
     fontSize: 22,
     fontWeight: "bold",
     color: "#333",
+    marginTop: 10,
   },
   profileEmail: {
-    fontSize: 19,
-    color: "#666",
+    fontSize: 16,
+    color: "#777",
     marginTop: 5,
   },
   menuContainer: {
-    width: "90%",
-    alignSelf: "center",
+    marginTop: 20,
+    paddingHorizontal: 20,
   },
-  optionBox: {
+  menuItem: {
     backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
-    width: "100%",
-    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    elevation: 3,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
-  optionText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
+  iconLabel: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
-  logoutButton: {
-    backgroundColor: "#ffe6e6",
+  menuText: {
+    fontSize: 16,
+    fontWeight: "500",
   },
-});
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+  },
+  profileCard: {
+  backgroundColor: "#fff",
+  marginHorizontal: 20,
+  paddingVertical: 30,
+  paddingHorizontal: 20,
+  borderRadius: 12,
+  alignItems: "center",
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.1,
+  shadowRadius: 6,
+  elevation: 5,
+  marginTop: 20,
+  marginBottom: 10,
+},
 
-export default Profile;
+});

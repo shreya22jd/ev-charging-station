@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     height: 250,
     width: 250,
     borderWidth: 3,
-    borderColor: '#2DBE7C',
+    borderColor: '#5bc99d',
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2DBE7C',
+    color: '#5bc99d',
     fontFamily: 'Poppins',
   },
 });

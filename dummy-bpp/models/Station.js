@@ -22,10 +22,12 @@ const chargingPointSchema = new mongoose.Schema({
 const stationSchema = new mongoose.Schema({
   name: { type: String, required: true },
   address: { type: String, required: true },
+  latitude: { type: Number, required: true },       // Add this
+  longitude: { type: Number, required: true },      // Add this
   chargingPoints: [chargingPointSchema],
-  types: [typeSchema], // Added types at station level
-  payeeVPA: { type: String, required: true },    // Receiver's UPI ID
-  payeeName: { type: String, required: true }    // Receiver's Name
+  types: [typeSchema],
+  payeeVPA: { type: String, required: true },
+  payeeName: { type: String, required: true }
 });
 
 module.exports = mongoose.model("Station", stationSchema);

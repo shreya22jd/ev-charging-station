@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#2DBE7C',
+    borderColor: '#5bc99d',
     borderRadius: 10,
     backgroundColor: '#fff',
     paddingHorizontal: 10,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   link: {
     fontSize: 16,
     fontFamily: 'Poppins',
-    color: '#2DBE7C',
+    color: '#5bc99d',
     fontWeight: 'bold',
   },
 });
